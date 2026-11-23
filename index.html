@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSE Performance Command Center 2026 - PT Elit Kharisma Utama</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#F0F4F8',
+                            800: '#15233B',
+                            900: '#0F1E36',
+                            950: '#0A1324'
+                        },
+                        emerald: {
+                            500: '#10B981',
+                            600: '#059669',
+                            700: '#047857'
+                        },
+                        caution: '#D97706',
+                        alert: '#DC2626'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .font-mono-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulse-active {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+
+        /* Odometer Card Glow */
+        .glow-card {
+            box-shadow: 0 4px 20px -2px rgba(15, 30, 54, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dark .glow-card {
+            box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+        }
+        .glow-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(15, 30, 54, 0.2);
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* SVG Arc Gauge Animation */
+        .gauge-arc {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-[#F4F6F9] text-slate-800 dark:bg-navy-950 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <!-- TOP TELEMETRY HEADER -->
+    <header class="bg-white dark:bg-navy-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 transition-colors shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            
+            <!-- Branding -->
+            <div class="flex items-center space-x-3.5">
+                <div class="w-10 h-10 rounded-lg bg-navy-900 dark:bg-emerald-500 text-emerald-400 dark:text-navy-950 flex items-center justify-center font-bold text-xl shadow-inner">
+                    EKU
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-bold tracking-tight text-navy-900 dark:text-white uppercase leading-tight">
+                            HSE Performance Command Center
+                        </h1>
+                        <span id="liveYearBadge" class="px-2 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 rounded-full border border-emerald-300 dark:border-emerald-800">
+                            2026 LIVE
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        PT ELIT KHARISMA UTAMA (EKU) — Site EKU Operations
+                    </p>
+                </div>
+            </div>
+
+            <!-- Status Indicator & Operational Controls -->
+            <div class="flex items-center space-x-3 text-xs">
+                <select id="yearSelect" onchange="switchYear(this.value)" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-900 text-slate-800 dark:text-slate-100 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"></select>
+                <button onclick="addNewYear()" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 font-semibold border border-emerald-300 dark:border-emerald-800 hover:opacity-80 transition">+ Tahun</button>
+                <button onclick="openDataModal()" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition">+ Data</button>
+                <div class="hidden md:flex items-center space-x-2 bg-slate-100 dark:bg-navy-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="font-medium text-slate-700 dark:text-slate-300">TARGET: <strong class="text-emerald-600 dark:text-emerald-400">ZERO FATALITY & LTI</strong></span>
+                </div>
+
+                <!-- Dark / Light Mode Toggle -->
+                <button id="themeToggle" onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-navy-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors" title="Beralih Tema Mode">
+                    <svg id="themeSun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="themeMoon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.03 9.03 0 0012 21a9.03 9.03 0 008.354-5.646z"></path></svg>
+                </button>
+
+                <!-- Export CSV Button -->
+                <button onclick="exportCSV()" class="flex items-center space-x-1.5 bg-navy-900 hover:bg-navy-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white dark:text-navy-950 font-semibold px-3 py-1.5 rounded-lg shadow transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Ekspor CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- TIMELINE SCRUBBER & FILTER BAR -->
+        <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center space-x-2">
+                    <button id="playBtn" onclick="toggleTimelinePlay()" class="p-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-semibold flex items-center justify-center shadow transition">
+                        <svg id="playIcon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                        <svg id="pauseIcon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/></svg>
+                    </button>
+                    <div>
+                        <span class="text-xs uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400 block">KONTROL WAKTU TELEMETRI</span>
+                        <span id="currentTimelineLabel" class="text-sm font-bold text-navy-900 dark:text-emerald-400">Semua Bulan (Januari – Desember 2026)</span>
+                    </div>
+                </div>
+
+                <!-- Filter View Modes -->
+                <div class="flex items-center bg-slate-100 dark:bg-navy-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                    <button id="filterBtnAll" onclick="setFilterView('ALL')" class="px-3 py-1.5 rounded-md bg-white dark:bg-navy-900 text-navy-900 dark:text-emerald-400 shadow-xs transition">
+                        Semua Bulan (Jan–Des)
+                    </button>
+                    <button id="filterBtnSelected" onclick="setFilterView('MONTH')" class="px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-white transition">
+                        Bulan Terpilih
+                    </button>
+                    <button id="filterBtnWeekly" onclick="setFilterView('WEEKLY')" class="px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-white transition">
+                        Data Mingguan (50 Baris)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Month Range Scrubber -->
+            <div class="pt-1">
+                <input type="range" id="monthScrubber" min="0" max="11" value="10" step="1" oninput="onScrubberChange(this.value)" class="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-200 dark:bg-slate-700 rounded-lg">
+                <div class="flex justify-between text-[11px] font-mono-num text-slate-400 mt-1 uppercase font-semibold">
+                    <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span>
+                    <span>Jul</span><span>Agu</span><span>Sep</span><span>Okt</span><span>Nov</span><span>Des</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- HERO KPI ODOMETERS & ZERO-HARM PULSE GAUGE -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+            
+            <!-- Safe Man Hours Gauge Widget -->
+            <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Status Safe Man Hours</p>
+                        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200">Tanpa Fatality & LTI</h3>
+                    </div>
+                    <span class="px-2 py-0.5 text-[10px] font-mono-num font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-800">
+                        SAFE RECORD
+                    </span>
+                </div>
+
+                <!-- Arc Gauge Graphic -->
+                <div class="my-4 flex items-center justify-center relative">
+                    <svg class="w-36 h-36 transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" class="text-slate-100 dark:text-navy-800" stroke-width="8" stroke="currentColor" fill="transparent" />
+                        <circle id="gaugeCircle" cx="50" cy="50" r="45" class="text-emerald-500 gauge-arc" stroke-width="8" stroke="currentColor" fill="transparent" stroke-linecap="round" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <span id="kpiSafeMH" class="text-xl font-bold font-mono-num text-navy-900 dark:text-white">1,828,673</span>
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Jam Kerja Aman</span>
+                    </div>
+                </div>
+
+                <div class="text-center bg-slate-50 dark:bg-navy-800/50 py-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Total Man Hours (Jan–Nov 2026):</p>
+                    <p id="kpiTotalMH" class="text-sm font-bold font-mono-num text-emerald-600 dark:text-emerald-400">356,139 Jam</p>
+                </div>
+            </div>
+
+            <!-- Metric Cards Column (3 Columns wide on LG) -->
+            <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                
+                <!-- Manpower Card -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Man Power Rata-Rata</span>
+                        <div class="p-2 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiMP" class="text-2xl font-extrabold font-mono-num text-navy-900 dark:text-white">123.3</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Personel Aktif (Jan–Nov)</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Puncak: <strong>133 (Feb & Mar)</strong></span>
+                        <span>Aktif M-11: <strong>116</strong></span>
+                    </div>
+                </div>
+
+                <!-- Leading Indicators Total -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Leading Indicators</span>
+                        <div class="p-2 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiLeading" class="text-2xl font-extrabold font-mono-num text-emerald-600 dark:text-emerald-400">572</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Total Kegiatan Pencegahan</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Induction: <strong>333</strong></span>
+                        <span>Inspeksi: <strong>91</strong></span>
+                    </div>
+                </div>
+
+                <!-- Lagging Indicators Total -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Lagging Telemetry</span>
+                        <div class="p-2 bg-amber-50 dark:bg-amber-950 text-caution rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline space-x-2">
+                        <div id="kpiLagging" class="text-2xl font-extrabold font-mono-num text-caution">8</div>
+                        <span class="text-xs text-slate-400 font-semibold">(5 PD + 3 NM)</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">0 Fatality / 0 LTI / 0 RWC / 0 MTC</p>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Property Damage: <strong class="text-amber-600">5</strong></span>
+                        <span>Near Miss: <strong class="text-amber-600">3</strong></span>
+                    </div>
+                </div>
+
+                <!-- Incident Rate (IR) Card -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Incident Rate (IR)</span>
+                        <div class="p-2 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiIR" class="text-2xl font-extrabold font-mono-num text-navy-900 dark:text-white">0.00554</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Rata-rata Incident Rate (Jan–Nov)</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Puncak Apr: <strong>0.0305</strong></span>
+                        <span>Maret: <strong>0.0226</strong></span>
+                    </div>
+                </div>
+
+                <!-- Action Closure Rate Card -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Action Closure (Tindakan)</span>
+                        <div class="p-2 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiAC" class="text-2xl font-extrabold font-mono-num text-emerald-600 dark:text-emerald-400">87</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tindakan Perbaikan Selesai</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Penutupan Akumulasi: <strong>81 M-11</strong></span>
+                        <span>Status: <strong class="text-emerald-600">Tuntas</strong></span>
+                    </div>
+                </div>
+
+                <!-- Safety Talks & Meetings Card -->
+                <div class="bg-white dark:bg-navy-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 glow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Safety Talks & Meetings</span>
+                        <div class="p-2 bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiTalks" class="text-2xl font-extrabold font-mono-num text-navy-900 dark:text-white">61</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">34 Safety Talks + 27 Weekly Meetings</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                        <span>Weekly Meeting: <strong>27</strong></span>
+                        <span>Safety Talk: <strong>34</strong></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SITE SAFETY TWIN / FIELD TELEMETRY STRIP -->
+        <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex flex-wrap justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-navy-900 dark:text-white flex items-center gap-2">
+                        <span>FIELD TELEMETRY & SITE SAFETY TWIN</span>
+                        <span class="px-2 py-0.5 text-[10px] font-mono-num font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 rounded">INTERAKTIF</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Klik atau sorot pos telemetry lapangan untuk memicu analisis mendalam.</p>
+                </div>
+                <div id="stationActiveBadge" class="text-xs font-semibold px-3 py-1 bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700">
+                    Pos Aktif: Ringkasan Keseluruhan Site
+                </div>
+            </div>
+
+            <!-- Nodes Strip Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                
+                <!-- Node 1: HSE Induction -->
+                <div onclick="selectStation('induction')" id="station-induction" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">HSE Induction</span>
+                    <span class="text-sm font-mono-num font-bold text-emerald-600 dark:text-emerald-400 block mt-0.5">333 Peserta</span>
+                    <span class="text-[10px] text-slate-400">Puncak: Mar (51)</span>
+                </div>
+
+                <!-- Node 2: Safety Meetings -->
+                <div onclick="selectStation('meeting')" id="station-meeting" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">Safety Meeting</span>
+                    <span class="text-sm font-mono-num font-bold text-cyan-600 dark:text-cyan-400 block mt-0.5">27 Sesi</span>
+                    <span class="text-[10px] text-slate-400">Konsisten Mingguan</span>
+                </div>
+
+                <!-- Node 3: Inspections -->
+                <div onclick="selectStation('inspection')" id="station-inspection" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">HSE Inspection</span>
+                    <span class="text-sm font-mono-num font-bold text-blue-600 dark:text-blue-400 block mt-0.5">91 Inspeksi</span>
+                    <span class="text-[10px] text-slate-400">Puncak: Apr (11)</span>
+                </div>
+
+                <!-- Node 4: Safety Talk -->
+                <div onclick="selectStation('talk')" id="station-talk" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">Safety Talk</span>
+                    <span class="text-sm font-mono-num font-bold text-purple-600 dark:text-purple-400 block mt-0.5">34 Pelaksanaan</span>
+                    <span class="text-[10px] text-slate-400">Puncak: Apr (5)</span>
+                </div>
+
+                <!-- Node 5: Action Closure -->
+                <div onclick="selectStation('closure')" id="station-closure" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">Action Closure</span>
+                    <span class="text-sm font-mono-num font-bold text-teal-600 dark:text-teal-400 block mt-0.5">87 Tindakan</span>
+                    <span class="text-[10px] text-slate-400">Puncak: Jan (20)</span>
+                </div>
+
+                <!-- Node 6: Incident Telemetry -->
+                <div onclick="selectStation('incident')" id="station-incident" class="cursor-pointer border border-slate-200 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 p-3 rounded-lg bg-slate-50 dark:bg-navy-800/40 transition-all text-center group">
+                    <div class="w-9 h-9 mx-auto rounded-full bg-amber-100 dark:bg-amber-950 text-caution flex items-center justify-center font-bold mb-2 group-hover:scale-110 transition-transform relative">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full animate-ping"></span>
+                    </div>
+                    <span class="text-xs font-bold block text-navy-900 dark:text-slate-200">Insiden Telemetry</span>
+                    <span class="text-sm font-mono-num font-bold text-caution block mt-0.5">5 PD / 3 NM</span>
+                    <span class="text-[10px] text-slate-400">Maret – Mei 2026</span>
+                </div>
+
+            </div>
+
+            <!-- Detail Telemetry Banner output -->
+            <div id="stationDetailPanel" class="p-4 bg-slate-50 dark:bg-navy-800/80 rounded-lg border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <span class="p-2 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-lg font-bold">INFO TELEMETRI</span>
+                    <p id="stationDetailText">Menampilkan seluruh performa leading & lagging indicator site PT Elit Kharisma Utama periode Januari hingga Desember 2026.</p>
+                </div>
+                <button onclick="resetStationSelect()" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">Reset Tampilan</button>
+            </div>
+        </div>
+
+        <!-- CHARTS GRID SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 1: Leading Indicators vs Lagging Telemetry -->
+            <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900 dark:text-white uppercase tracking-wider">
+                            1. Leading Indicators vs Lagging Telemetry
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Perbandingan Aktivitas Pencegahan & Kejadian Insiden Bulanan</p>
+                    </div>
+                    <span class="text-[11px] font-mono-num font-bold text-slate-400 bg-slate-100 dark:bg-navy-800 px-2 py-1 rounded">
+                        Jan - Des 2026
+                    </span>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="chartLeadingVsLagging"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Safe Man Hours & Man Power Progression -->
+            <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900 dark:text-white uppercase tracking-wider">
+                            2. Safe Man Hours & Man Power Trend
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Akumulasi Jam Kerja Aman & Jumlah Personel Lapangan</p>
+                    </div>
+                    <span class="text-[11px] font-mono-num font-bold text-slate-400 bg-slate-100 dark:bg-navy-800 px-2 py-1 rounded">
+                        Terkonfirmasi Jan–Nov
+                    </span>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="chartManpowerSafeMH"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Leading Activity Breakdown (MTD vs LTD) -->
+            <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900 dark:text-white uppercase tracking-wider">
+                            3. Distribusi Komponen Leading Indicators
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Total Akumulasi Kegiatan Keselamatan Lapangan</p>
+                    </div>
+                    <span class="text-[11px] font-mono-num font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded">
+                        Total: 572
+                    </span>
+                </div>
+                <div class="relative h-72 w-full flex items-center justify-center">
+                    <canvas id="chartLeadingDistribution"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 4: Incident Rate (IR) & Risk Trend Curve -->
+            <div class="bg-white dark:bg-navy-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-navy-900 dark:text-white uppercase tracking-wider">
+                            4. Incident Rate (IR) Trend Telemetry
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Tingkat Insiden (Property Damage & Near Miss per Man Hours)</p>
+                    </div>
+                    <span class="text-[11px] font-mono-num font-bold bg-amber-50 dark:bg-amber-950 text-caution px-2 py-1 rounded">
+                        Rata-rata: 0.00554
+                    </span>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="chartIncidentRate"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MATRIX & DRILLDOWN DATA TABLE (50 WEEKLY ROWS + MONTHLY DATA) -->
+        <div class="bg-white dark:bg-navy-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            
+            <!-- Table Header Bar -->
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4 bg-slate-50/50 dark:bg-navy-800/30">
+                <div>
+                    <h3 class="text-base font-bold text-navy-900 dark:text-white flex items-center gap-2">
+                        <span>DATA MINGGUAN & MATRIX BULANAN (50 BARIS TELEMETRI)</span>
+                        <span id="recordCountBadge" class="px-2 py-0.5 text-xs font-mono-num font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-full">
+                            50 Baris
+                        </span>
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Tabel lengkap rincian Man Power, Man Hours, Incident & Leading Indicators per minggu.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <input type="text" id="tableSearch" onkeyup="filterTableData()" placeholder="Cari Minggu / Bulan..." class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-48">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+
+                    <!-- Month Filter Select -->
+                    <select id="monthSelectFilter" onchange="filterTableData()" class="px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="ALL">Semua Bulan (Jan-Des)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table Responsive Container -->
+            <div class="overflow-x-auto max-h-[480px]">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-100 dark:bg-navy-800/90 text-slate-600 dark:text-slate-300 sticky top-0 z-10 uppercase tracking-wider font-semibold font-mono-num border-b border-slate-200 dark:border-slate-700">
+                        <tr>
+                            <th class="py-3 px-4">Bulan / Minggu</th>
+                            <th class="py-3 px-3 text-right">MP</th>
+                            <th class="py-3 px-3 text-right">Man Hours</th>
+                            <th class="py-3 px-3 text-center">Fatality</th>
+                            <th class="py-3 px-3 text-center">LTI/LWDC</th>
+                            <th class="py-3 px-3 text-center">PD</th>
+                            <th class="py-3 px-3 text-center">NM</th>
+                            <th class="py-3 px-3 text-right">Induction</th>
+                            <th class="py-3 px-3 text-right">Safety Mtg</th>
+                            <th class="py-3 px-3 text-right">Inspeksi</th>
+                            <th class="py-3 px-3 text-right">Safety Talk</th>
+                            <th class="py-3 px-3 text-right">Action Closure</th>
+                            <th class="py-3 px-3 text-center">Status Field</th>
+                            <th class="py-3 px-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weeklyTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono-num text-slate-700 dark:text-slate-300">
+                        <!-- Dynamic JavaScript rendering -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer Summary -->
+            <div class="p-3 bg-slate-50 dark:bg-navy-800/50 border-t border-slate-200 dark:border-slate-800 text-xs flex flex-wrap justify-between items-center text-slate-500 dark:text-slate-400 font-mono-num">
+                <span>Total 50 Minggu Terdata (W1 - W4 / W6 per Bulan)</span>
+                <span>Kumulatif Safe Hours: <strong class="text-emerald-600 dark:text-emerald-400 font-bold">1,828,673</strong></span>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- DATA ENTRY / EDIT MODAL -->
+    <div id="dataModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 p-4">
+        <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 shadow-2xl">
+            <div class="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-navy-900">
+                <div>
+                    <h3 id="dataModalTitle" class="font-bold text-navy-900 dark:text-white">Tambah Data Mingguan</h3>
+                    <p class="text-xs text-slate-500">Data disimpan otomatis di browser untuk tahun terpilih.</p>
+                </div>
+                <button onclick="closeDataModal()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-navy-800 text-slate-500">X</button>
+            </div>
+            <form id="dataForm" onsubmit="saveDataRow(event)" class="p-5 space-y-4">
+                <input type="hidden" id="editRowIndex" value="-1">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label class="text-xs font-semibold">Tahun
+                        <input id="formYear" type="number" min="2000" max="2100" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2">
+                    </label>
+                    <label class="text-xs font-semibold">Bulan
+                        <select id="formMonth" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></select>
+                    </label>
+                    <label class="text-xs font-semibold">Minggu
+                        <select id="formWeek" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></select>
+                    </label>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <label class="text-xs font-semibold">MP<input id="formMp" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Man Hours<input id="formMh" type="number" min="0" step="0.01" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Fatality<input id="formFat" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">LWDC<input id="formLwdc" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Property Damage<input id="formPd" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Near Miss<input id="formNm" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Induction<input id="formInd" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Safety Meeting<input id="formSm" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Inspeksi<input id="formIns" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Safety Talk<input id="formSt" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                    <label class="text-xs font-semibold">Action Closure<input id="formAc" type="number" min="0" required class="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-navy-950 px-3 py-2"></label>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeDataModal()" class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-sm">Batal</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-navy-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-8 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
+            <p id="footerDepartment" class="font-semibold text-slate-700 dark:text-slate-300">PT ELIT KHARISMA UTAMA (EKU) — HEALTH, SAFETY & ENVIRONMENT DEPARTMENT 2026</p>
+            <p>Sistem Visual Telemetry Zero-Harm & Reporting Terintegrasi Data Excel Desember 2026.</p>
+        </div>
+    </footer>
+
+    <!-- DYNAMIC JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           EXACT EMBEDDED DATASET FROM HSE_PERFORMANCE_EKU_2026_DASHBOARD_DESEMBER.xlsx
+           ========================================================================== */
+        
+        const baseMonthlyData = [
+            { id: 0, month: "JANUARI 2026", weeksLabel: "WEEK 1-4", mp: 131, mh: 41265, safeMh: 1513799, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 39, indLtd: 39, smMtd: 3, smLtd: 3, insMtd: 7, insLtd: 7, stMtd: 4, stLtd: 4, acMtd: 20, acLtd: 20, totalLeading: 73 },
+            { id: 1, month: "FEBRUARI 2026", weeksLabel: "WEEK 5-8", mp: 133, mh: 33201, safeMh: 1547000, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 19, indLtd: 58, smMtd: 3, smLtd: 6, insMtd: 9, insLtd: 16, stMtd: 4, stLtd: 8, acMtd: 9, acLtd: 29, totalLeading: 44 },
+            { id: 2, month: "MARET 2026", weeksLabel: "WEEK 9-12", mp: 133, mh: 33516, safeMh: 1580516, fat: 0, lwdc: 0, pd: 2, nm: 1, ir: 0.022556, indMtd: 51, indLtd: 109, smMtd: 2, smLtd: 8, insMtd: 8, insLtd: 24, stMtd: 2, stLtd: 10, acMtd: 10, acLtd: 39, totalLeading: 73 },
+            { id: 3, month: "APRIL 2026", weeksLabel: "WEEK 13-16", mp: 131, mh: 41076, safeMh: 1621592, fat: 0, lwdc: 0, pd: 3, nm: 1, ir: 0.030534, indMtd: 40, indLtd: 149, smMtd: 2, smLtd: 10, insMtd: 11, insLtd: 35, stMtd: 5, stLtd: 15, acMtd: 10, acLtd: 49, totalLeading: 76 },
+            { id: 4, month: "MEI 2026", weeksLabel: "WEEK 17-20", mp: 128, mh: 32256, safeMh: 1653848, fat: 0, lwdc: 0, pd: 0, nm: 1, ir: 0.007813, indMtd: 26, indLtd: 175, smMtd: 2, smLtd: 12, insMtd: 8, insLtd: 43, stMtd: 2, stLtd: 17, acMtd: 6, acLtd: 55, totalLeading: 44 },
+            { id: 5, month: "JUNI 2026", weeksLabel: "WEEK 21-24", mp: 128, mh: 31752, safeMh: 1685600, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 36, indLtd: 185, smMtd: 1, smLtd: 11, insMtd: 7, insLtd: 42, stMtd: 1, stLtd: 16, acMtd: 12, acLtd: 61, totalLeading: 57 },
+            { id: 6, month: "JULI 2026", weeksLabel: "WEEK 25-28", mp: 116, mh: 36351, safeMh: 1721951, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 33, indLtd: 218, smMtd: 3, smLtd: 14, insMtd: 7, insLtd: 49, stMtd: 2, stLtd: 18, acMtd: 9, acLtd: 70, totalLeading: 54 },
+            { id: 7, month: "AGUSTUS 2026", weeksLabel: "WEEK 29-32", mp: 109, mh: 27909, safeMh: 1749860, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 17, indLtd: 235, smMtd: 1, smLtd: 15, insMtd: 8, insLtd: 57, stMtd: 3, stLtd: 21, acMtd: 2, acLtd: 72, totalLeading: 31 },
+            { id: 8, month: "SEPTEMBER 2026", weeksLabel: "WEEK 33-36", mp: 115, mh: 28035, safeMh: 1777895, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 44, indLtd: 279, smMtd: 3, smLtd: 18, insMtd: 10, insLtd: 67, stMtd: 4, stLtd: 25, acMtd: 5, acLtd: 77, totalLeading: 64 },
+            { id: 9, month: "OKTOBER 2026", weeksLabel: "WEEK 37-40", mp: 116, mh: 29232, safeMh: 1807127, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 17, indLtd: 296, smMtd: 4, smLtd: 22, insMtd: 10, insLtd: 77, stMtd: 4, stLtd: 29, acMtd: 4, acLtd: 81, totalLeading: 39 },
+            { id: 10, month: "NOVEMBER 2026", weeksLabel: "WEEK 41-44", mp: 116, mh: 21546, safeMh: 1828673, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 11, indLtd: 307, smMtd: 3, smLtd: 25, insMtd: 6, insLtd: 83, stMtd: 3, stLtd: 32, acMtd: 0, acLtd: 81, totalLeading: 23 },
+            { id: 11, month: "DESEMBER 2026", weeksLabel: "WEEK 45-48", mp: 0, mh: 0, safeMh: 1828673, fat: 0, lwdc: 0, pd: 0, nm: 0, ir: 0, indMtd: 0, indLtd: 333, smMtd: 0, smLtd: 27, insMtd: 0, insLtd: 91, stMtd: 0, stLtd: 34, acMtd: 0, acLtd: 87, totalLeading: 0 }
+        ];
+
+        // 50 Weekly Detailed Rows exact matching Excel
+        const baseWeeklyData = [
+            // JANUARI 2026
+            { month: "JANUARI 2026", week: "Jan - W1", mp: 131, mh: 10300, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 10, sm: 1, ins: 2, st: 1, ac: 5 },
+            { month: "JANUARI 2026", week: "Jan - W2", mp: 131, mh: 10300, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 10, sm: 1, ins: 1, st: 1, ac: 5 },
+            { month: "JANUARI 2026", week: "Jan - W3", mp: 131, mh: 10332.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 10, sm: 1, ins: 2, st: 1, ac: 5 },
+            { month: "JANUARI 2026", week: "Jan - W4", mp: 131, mh: 10332.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 0, ins: 2, st: 1, ac: 5 },
+
+            // FEBRUARI 2026
+            { month: "FEBRUARI 2026", week: "Feb - W1", mp: 133, mh: 8300, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 5, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "FEBRUARI 2026", week: "Feb - W2", mp: 133, mh: 8300, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 5, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "FEBRUARI 2026", week: "Feb - W3", mp: 133, mh: 8300.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 5, sm: 1, ins: 3, st: 1, ac: 3 },
+            { month: "FEBRUARI 2026", week: "Feb - W4", mp: 133, mh: 8300.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 0, ins: 2, st: 1, ac: 2 },
+
+            // MARET 2026
+            { month: "MARET 2026", week: "Mar - W1", mp: 133, mh: 8379, fat: 0, lwdc: 0, pd: 1, nm: 0, ind: 13, sm: 1, ins: 2, st: 1, ac: 3 },
+            { month: "MARET 2026", week: "Mar - W2", mp: 133, mh: 8379, fat: 0, lwdc: 0, pd: 1, nm: 1, ind: 13, sm: 0, ins: 2, st: 0, ac: 2 },
+            { month: "MARET 2026", week: "Mar - W3", mp: 133, mh: 8379, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 13, sm: 1, ins: 2, st: 1, ac: 3 },
+            { month: "MARET 2026", week: "Mar - W4", mp: 133, mh: 8379, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 12, sm: 0, ins: 2, st: 0, ac: 2 },
+
+            // APRIL 2026
+            { month: "APRIL 2026", week: "Apr - W1", mp: 131, mh: 10269, fat: 0, lwdc: 0, pd: 1, nm: 1, ind: 10, sm: 1, ins: 3, st: 2, ac: 3 },
+            { month: "APRIL 2026", week: "Apr - W2", mp: 131, mh: 10269, fat: 0, lwdc: 0, pd: 1, nm: 0, ind: 10, sm: 0, ins: 3, st: 1, ac: 2 },
+            { month: "APRIL 2026", week: "Apr - W3", mp: 131, mh: 10269, fat: 0, lwdc: 0, pd: 1, nm: 0, ind: 10, sm: 1, ins: 3, st: 1, ac: 3 },
+            { month: "APRIL 2026", week: "Apr - W4", mp: 131, mh: 10269, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 10, sm: 0, ins: 2, st: 1, ac: 2 },
+
+            // MEI 2026
+            { month: "MEI 2026", week: "Mei - W1", mp: 128, mh: 8064, fat: 0, lwdc: 0, pd: 0, nm: 1, ind: 7, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "MEI 2026", week: "Mei - W2", mp: 128, mh: 8064, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 7, sm: 0, ins: 2, st: 0, ac: 1 },
+            { month: "MEI 2026", week: "Mei - W3", mp: 128, mh: 8064, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 6, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "MEI 2026", week: "Mei - W4", mp: 128, mh: 8064, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 6, sm: 0, ins: 2, st: 0, ac: 1 },
+
+            // JUNI 2026
+            { month: "JUNI 2026", week: "Jun - W1", mp: 128, mh: 7938, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 0, ins: 2, st: 0, ac: 3 },
+            { month: "JUNI 2026", week: "Jun - W2", mp: 128, mh: 7938, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 1, ins: 2, st: 1, ac: 3 },
+            { month: "JUNI 2026", week: "Jun - W3", mp: 128, mh: 7938, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 0, ins: 1, st: 0, ac: 3 },
+            { month: "JUNI 2026", week: "Jun - W4", mp: 128, mh: 7938, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 0, ins: 2, st: 0, ac: 3 },
+
+            // JULI 2026
+            { month: "JULI 2026", week: "Jul - W1", mp: 116, mh: 9087.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 8, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "JULI 2026", week: "Jul - W2", mp: 116, mh: 9087.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 8, sm: 1, ins: 2, st: 0, ac: 2 },
+            { month: "JULI 2026", week: "Jul - W3", mp: 116, mh: 9087.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 9, sm: 1, ins: 1, st: 1, ac: 3 },
+            { month: "JULI 2026", week: "Jul - W4", mp: 116, mh: 9087.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 8, sm: 0, ins: 2, st: 0, ac: 2 },
+
+            // AGUSTUS 2026
+            { month: "AGUSTUS 2026", week: "Agu - W1", mp: 109, mh: 6977.25, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 5, sm: 0, ins: 2, st: 1, ac: 0 },
+            { month: "AGUSTUS 2026", week: "Agu - W2", mp: 109, mh: 6977.25, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 1, ins: 2, st: 1, ac: 1 },
+            { month: "AGUSTUS 2026", week: "Agu - W3", mp: 109, mh: 6977.25, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 0, ins: 2, st: 0, ac: 0 },
+            { month: "AGUSTUS 2026", week: "Agu - W4", mp: 109, mh: 6977.25, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 0, ins: 2, st: 1, ac: 1 },
+
+            // SEPTEMBER 2026
+            { month: "SEPTEMBER 2026", week: "Sep - W1", mp: 115, mh: 7008.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 11, sm: 1, ins: 3, st: 1, ac: 1 },
+            { month: "SEPTEMBER 2026", week: "Sep - W2", mp: 115, mh: 7008.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 11, sm: 1, ins: 2, st: 1, ac: 2 },
+            { month: "SEPTEMBER 2026", week: "Sep - W3", mp: 115, mh: 7008.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 11, sm: 0, ins: 3, st: 1, ac: 1 },
+            { month: "SEPTEMBER 2026", week: "Sep - W4", mp: 115, mh: 7008.75, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 11, sm: 1, ins: 2, st: 1, ac: 1 },
+
+            // OKTOBER 2026
+            { month: "OKTOBER 2026", week: "Okt - W1", mp: 116, mh: 7308, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 1, ins: 3, st: 1, ac: 1 },
+            { month: "OKTOBER 2026", week: "Okt - W2", mp: 116, mh: 7308, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 1, ins: 2, st: 1, ac: 1 },
+            { month: "OKTOBER 2026", week: "Okt - W3", mp: 116, mh: 7308, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 5, sm: 1, ins: 3, st: 1, ac: 1 },
+            { month: "OKTOBER 2026", week: "Okt - W4", mp: 116, mh: 7308, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 4, sm: 1, ins: 2, st: 1, ac: 1 },
+
+            // NOVEMBER 2026
+            { month: "NOVEMBER 2026", week: "Nov - W1", mp: 116, mh: 5386.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 3, sm: 1, ins: 2, st: 1, ac: 0 },
+            { month: "NOVEMBER 2026", week: "Nov - W2", mp: 116, mh: 5386.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 3, sm: 1, ins: 1, st: 1, ac: 0 },
+            { month: "NOVEMBER 2026", week: "Nov - W3", mp: 116, mh: 5386.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 3, sm: 1, ins: 2, st: 1, ac: 0 },
+            { month: "NOVEMBER 2026", week: "Nov - W4", mp: 116, mh: 5386.5, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 2, sm: 0, ins: 1, st: 0, ac: 0 },
+
+            // DESEMBER 2026 (W1 - W6 standby / zero)
+            { month: "DESEMBER 2026", week: "Des - W1", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 },
+            { month: "DESEMBER 2026", week: "Des - W2", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 },
+            { month: "DESEMBER 2026", week: "Des - W3", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 },
+            { month: "DESEMBER 2026", week: "Des - W4", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 },
+            { month: "DESEMBER 2026", week: "Des - W5", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 },
+            { month: "DESEMBER 2026", week: "Des - W6", mp: 0, mh: 0, fat: 0, lwdc: 0, pd: 0, nm: 0, ind: 0, sm: 0, ins: 0, st: 0, ac: 0 }
+        ];
+
+        /* ==========================================================================
+           APPLICATION STATE & VARIABLES
+           ========================================================================== */
+        let monthlyData = [];
+        let weeklyData = [];
+        let yearlyStore = {};
+        let currentYear = 2026;
+        let timelineIndex = 10; // Default to Nov 2026 (latest populated data)
+        let isTimelinePlaying = false;
+        let timelineTimer = null;
+        let activeViewMode = 'ALL'; // 'ALL', 'MONTH', 'WEEKLY'
+        let chartInstances = {};
+
+        const monthNames = ["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
+        const monthShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+        const storageKey = "eku_hse_yearly_data_v1";
+
+        function cloneRows(rows) {
+            return JSON.parse(JSON.stringify(rows));
+        }
+
+        function initializeYearData() {
+            try {
+                yearlyStore = JSON.parse(localStorage.getItem(storageKey)) || {};
+            } catch (error) {
+                yearlyStore = {};
+            }
+
+            if (!yearlyStore["2026"]) {
+                yearlyStore["2026"] = {
+                    monthlyData: cloneRows(baseMonthlyData),
+                    weeklyData: cloneRows(baseWeeklyData)
+                };
+                localStorage.setItem(storageKey, JSON.stringify(yearlyStore));
+            }
+            loadYearData(currentYear);
+        }
+
+        function loadYearData(year) {
+            currentYear = parseInt(year);
+            const data = yearlyStore[String(currentYear)];
+            if (data) {
+                monthlyData = cloneRows(data.monthlyData);
+                weeklyData = cloneRows(data.weeklyData);
+            } else {
+                monthlyData = createBlankMonthlyData(currentYear);
+                weeklyData = createBlankWeeklyData(currentYear);
+            }
+            document.getElementById('liveYearBadge').innerText = `${currentYear} LIVE`;
+            document.querySelector('title').innerText = `HSE Performance Command Center ${currentYear} - PT Elit Kharisma Utama`;
+            populateYearControls();
+            populateMonthFilter();
+        }
+
+        function createBlankMonthlyData(year) {
+            return monthNames.map((name, index) => ({
+                id:index, month:`${name} ${year}`, weeksLabel:`WEEK ${index * 4 + 1}-${index * 4 + 4}`,
+                mp:0, mh:0, safeMh:0, fat:0, lwdc:0, pd:0, nm:0, ir:0,
+                indMtd:0, indLtd:0, smMtd:0, smLtd:0, insMtd:0, insLtd:0,
+                stMtd:0, stLtd:0, acMtd:0, acLtd:0, totalLeading:0
+            }));
+        }
+
+        function createBlankWeeklyData(year) {
+            const rows = [];
+            monthNames.forEach((name, monthIndex) => {
+                const weekCount = monthIndex === 11 ? 6 : 4;
+                for (let weekIndex = 1; weekIndex <= weekCount; weekIndex++) {
+                    rows.push({
+                        month:`${name} ${year}`, week:`${monthShort[monthIndex]} - W${weekIndex}`,
+                        mp:0, mh:0, fat:0, lwdc:0, pd:0, nm:0, ind:0, sm:0, ins:0, st:0, ac:0
+                    });
+                }
+            });
+            return rows;
+        }
+
+        function populateYearControls() {
+            const years = Object.keys(yearlyStore).map(Number).sort((a,b) => b-a);
+            if (!years.includes(currentYear)) years.push(currentYear);
+            years.sort((a,b) => b-a);
+            document.getElementById('yearSelect').innerHTML = years.map(year =>
+                `<option value="${year}" ${year === currentYear ? "selected" : ""}>${year}</option>`
+            ).join('');
+        }
+
+        function populateMonthFilter() {
+            const select = document.getElementById('monthSelectFilter');
+            select.innerHTML = `<option value="ALL">Semua Bulan (Jan-Des)</option>` +
+                monthNames.map(name => `<option value="${name}">${name.charAt(0) + name.slice(1).toLowerCase()} ${currentYear}</option>`).join('');
+        }
+
+        function saveYearStore() {
+            yearlyStore[String(currentYear)] = {
+                monthlyData: cloneRows(monthlyData),
+                weeklyData: cloneRows(weeklyData)
+            };
+            localStorage.setItem(storageKey, JSON.stringify(yearlyStore));
+        }
+
+        /* ==========================================================================
+           INITIALIZATION ON LOAD
+           ========================================================================== */
+        window.onload = function() {
+            initializeYearData();
+            initGaugeArc();
+            renderTableData(weeklyData);
+            initCharts();
+            updateOdometerUI(timelineIndex);
+            
+            // Check system dark theme pre-flight
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                toggleTheme(true);
+            }
+        };
+
+        /* ==========================================================================
+           THEME TOGGLE
+           ========================================================================== */
+        function toggleTheme(forceDark = false) {
+            const htmlEl = document.documentElement;
+            const sunIcon = document.getElementById('themeSun');
+            const moonIcon = document.getElementById('themeMoon');
+
+            if (forceDark || !htmlEl.classList.contains('dark')) {
+                htmlEl.classList.add('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                htmlEl.classList.remove('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+            
+            // Re-render chart colors for dark mode context
+            if (chartInstances.chartLeadingVsLagging) {
+                updateChartThemes();
+            }
+        }
+
+        /* ==========================================================================
+           GAUGE ARC ANIMATION
+           ========================================================================== */
+        function initGaugeArc() {
+            const circle = document.getElementById('gaugeCircle');
+            if (circle) {
+                // 100% Zero-LTI compliance = offset 0 (full circle)
+                setTimeout(() => {
+                    circle.style.strokeDashoffset = '0';
+                }, 300);
+            }
+        }
+
+        /* ==========================================================================
+           TIMELINE CONTROLLER & PLAYBACK
+           ========================================================================== */
+        function onScrubberChange(val) {
+            timelineIndex = parseInt(val);
+            updateOdometerUI(timelineIndex);
+            if (activeViewMode === 'MONTH') {
+                filterTableData();
+            }
+        }
+
+        function toggleTimelinePlay() {
+            isTimelinePlaying = !isTimelinePlaying;
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+
+            if (isTimelinePlaying) {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                timelineTimer = setInterval(() => {
+                    timelineIndex = (timelineIndex + 1) % 12;
+                    document.getElementById('monthScrubber').value = timelineIndex;
+                    onScrubberChange(timelineIndex);
+                }, 1600);
+            } else {
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                clearInterval(timelineTimer);
+            }
+        }
+
+        function setFilterView(mode) {
+            activeViewMode = mode;
+            const btnAll = document.getElementById('filterBtnAll');
+            const btnMonth = document.getElementById('filterBtnSelected');
+            const btnWeekly = document.getElementById('filterBtnWeekly');
+
+            [btnAll, btnMonth, btnWeekly].forEach(btn => {
+                btn.className = "px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-400 hover:text-navy-900 dark:hover:text-white transition";
+            });
+
+            if (mode === 'ALL') {
+                btnAll.className = "px-3 py-1.5 rounded-md bg-white dark:bg-navy-900 text-navy-900 dark:text-emerald-400 shadow-xs font-bold transition";
+                document.getElementById('currentTimelineLabel').innerText = "Semua Bulan (Januari – Desember 2026)";
+            } else if (mode === 'MONTH') {
+                btnMonth.className = "px-3 py-1.5 rounded-md bg-white dark:bg-navy-900 text-navy-900 dark:text-emerald-400 shadow-xs font-bold transition";
+            } else {
+                btnWeekly.className = "px-3 py-1.5 rounded-md bg-white dark:bg-navy-900 text-navy-900 dark:text-emerald-400 shadow-xs font-bold transition";
+                document.getElementById('currentTimelineLabel').innerText = "View Data Mingguan Lapangan";
+            }
+
+            filterTableData();
+        }
+
+        /* ==========================================================================
+           ODOMETER & DYNAMIC KPI UPDATER
+           ========================================================================== */
+        function updateOdometerUI(idx) {
+            const data = monthlyData[idx];
+            document.getElementById('currentTimelineLabel').innerText = `${data.month} (${data.weeksLabel})`;
+
+            // Smooth numeric update animation
+            animateCount('kpiSafeMH', data.safeMh || 1828673);
+            animateCount('kpiTotalMH', data.mh, ' Jam');
+            animateCount('kpiMP', data.mp);
+            animateCount('kpiLeading', data.totalLeading);
+            
+            const laggingSum = data.pd + data.nm;
+            document.getElementById('kpiLagging').innerText = laggingSum;
+            document.getElementById('kpiIR').innerText = data.ir !== null ? data.ir.toFixed(5) : "0.00000";
+            document.getElementById('kpiAC').innerText = data.acMtd;
+            document.getElementById('kpiTalks').innerText = data.stMtd + data.smMtd;
+
+            // Highlight corresponding bar in chart if initialized
+            if (chartInstances.chartLeadingVsLagging) {
+                chartInstances.chartLeadingVsLagging.setActiveElements([{ datasetIndex: 0, index: idx }]);
+                chartInstances.chartLeadingVsLagging.update();
+            }
+        }
+
+        function animateCount(elementId, targetValue, suffix = '') {
+            const el = document.getElementById(elementId);
+            if (!el || targetValue === null || targetValue === undefined) return;
+            
+            const startValue = parseInt(el.innerText.replace(/,/g, '')) || 0;
+            const duration = 600;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+                el.innerText = currentValue.toLocaleString('en-US') + suffix;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        /* ==========================================================================
+           SITE SAFETY TWIN TELEMETRY INTERACTION
+           ========================================================================== */
+        function selectStation(type) {
+            const panel = document.getElementById('stationDetailPanel');
+            const text = document.getElementById('stationDetailText');
+            const badge = document.getElementById('stationActiveBadge');
+
+            const stations = {
+                induction: {
+                    title: "Pos Telemetry: HSE Induction Hub",
+                    desc: "333 Total Peserta Induksi Jan-Des. Puncak tertinggi tercatat pada Maret 2026 (51 induksi), memastikan 100% pekerja dan mitra site teredukasi aturan HSE.",
+                    badge: "Pencapaian: 333 Worker Inductions"
+                },
+                meeting: {
+                    title: "Pos Telemetry: Safety Meeting Platform",
+                    desc: "27 Sesi Safety Meeting Mingguan terselenggara. Konsistensi pembahasan isu keselamatan kerja dari tingkat supervisor hingga manajemen.",
+                    badge: "Pencapaian: 27 Weekly Meetings"
+                },
+                inspection: {
+                    title: "Pos Telemetry: HSE Inspection Rig",
+                    desc: "91 Inspeksi Lapangan Mandiri diselesaikan. Pengawasan aktif peralatan berat, APD, dan kepatuhan prosedur di area operasional EKU.",
+                    badge: "Pencapaian: 91 Inspections Completed"
+                },
+                talk: {
+                    title: "Pos Telemetry: Daily Safety Talk Zone",
+                    desc: "34 Sesi Safety Talk dilaksanakan sebelum dimulainya shift kerja harian untuk penyegaran kesadaran bahaya pra-operasional.",
+                    badge: "Pencapaian: 34 Safety Talks"
+                },
+                closure: {
+                    title: "Pos Telemetry: Action Closure Operations",
+                    desc: "87 Tindakan Perbaikan (Action Closure) dituntaskan. 100% rekomendasi dari temuan inspeksi dan Near Miss telah direalisasikan.",
+                    badge: "Status: 87 Action Items Closed"
+                },
+                incident: {
+                    title: "Pos Telemetry: Incident Telemetry Station",
+                    desc: "Zero Fatality & Zero LTI. 5 Property Damage (Mar: 2, Apr: 3) & 3 Near Miss (Mar: 1, Apr: 1, Mei: 1). Seluruh temuan telah ditindaklanjuti dengan evaluasi ketat.",
+                    badge: "Status: 0 Fatality / 0 LTI (5 PD, 3 NM)"
+                }
+            };
+
+            const info = stations[type];
+            if (info) {
+                text.innerHTML = `<strong>${info.title}:</strong> ${info.desc}`;
+                badge.innerText = info.badge;
+                panel.classList.add('ring-2', 'ring-emerald-500');
+                setTimeout(() => panel.classList.remove('ring-2', 'ring-emerald-500'), 1500);
+            }
+        }
+
+        function resetStationSelect() {
+            document.getElementById('stationDetailText').innerText = "Menampilkan seluruh performa leading & lagging indicator site PT Elit Kharisma Utama periode Januari hingga Desember 2026.";
+            document.getElementById('stationActiveBadge').innerText = "Pos Aktif: Ringkasan Keseluruhan Site";
+        }
+
+        /* ==========================================================================
+           CHART.JS DATA VISUALIZATIONS
+           ========================================================================== */
+        function initCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+            const textColor = isDark ? '#94A3B8' : '#64748B';
+
+            const labelsMonths = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+            // 1. Chart Leading vs Lagging
+            const ctx1 = document.getElementById('chartLeadingVsLagging').getContext('2d');
+            chartInstances.chartLeadingVsLagging = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labelsMonths,
+                    datasets: [
+                        {
+                            label: 'Leading Indicators (Total)',
+                            data: monthlyData.map(d => d.totalLeading),
+                            backgroundColor: '#10B981',
+                            borderRadius: 6,
+                            order: 2
+                        },
+                        {
+                            label: 'Lagging Events (PD + NM)',
+                            data: monthlyData.map(d => d.pd + d.nm),
+                            backgroundColor: '#D97706',
+                            borderRadius: 6,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                footer: (items) => {
+                                    const idx = items[0].dataIndex;
+                                    const m = monthlyData[idx];
+                                    return `PD: ${m.pd} | NM: ${m.nm} | MTD Induksi: ${m.indMtd}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor } }
+                    }
+                }
+            });
+
+            // 2. Chart Safe Man Hours & Man Power Progression
+            const ctx2 = document.getElementById('chartManpowerSafeMH').getContext('2d');
+            chartInstances.chartManpowerSafeMH = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labelsMonths,
+                    datasets: [
+                        {
+                            label: 'Man Power (Personel)',
+                            data: monthlyData.map(d => d.mp),
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'yMP'
+                        },
+                        {
+                            label: 'Akumulasi Safe Man Hours',
+                            data: monthlyData.map(d => d.safeMh),
+                            borderColor: '#10B981',
+                            borderDash: [5, 5],
+                            tension: 0.2,
+                            yAxisID: 'ySafeMH'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor } },
+                        yMP: { type: 'linear', position: 'left', grid: { color: gridColor }, ticks: { color: textColor } },
+                        ySafeMH: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: textColor } }
+                    }
+                }
+            });
+
+            // 3. Chart Leading Activity Breakdown (Doughnut)
+            const ctx3 = document.getElementById('chartLeadingDistribution').getContext('2d');
+            chartInstances.chartLeadingDistribution = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: ['HSE Induction (333)', 'HSE Inspection (91)', 'Action Closure (87)', 'Safety Talk (34)', 'Safety Meeting (27)'],
+                    datasets: [{
+                        data: [333, 91, 87, 34, 27],
+                        backgroundColor: ['#10B981', '#3B82F6', '#14B8A6', '#8B5CF6', '#06B6D4'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    cutout: '68%'
+                }
+            });
+
+            // 4. Chart Incident Rate Trend
+            const ctx4 = document.getElementById('chartIncidentRate').getContext('2d');
+            chartInstances.chartIncidentRate = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: labelsMonths,
+                    datasets: [{
+                        label: 'Incident Rate (IR)',
+                        data: monthlyData.map(d => d.ir),
+                        borderColor: '#DC2626',
+                        backgroundColor: 'rgba(220, 38, 38, 0.15)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#DC2626',
+                        pointRadius: [3, 3, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (item) => `IR: ${item.raw ? item.raw.toFixed(6) : 0}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor } }
+                    }
+                }
+            });
+        }
+
+        function updateChartThemes() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+            const textColor = isDark ? '#94A3B8' : '#64748B';
+
+            Object.values(chartInstances).forEach(chart => {
+                if (chart.options.scales) {
+                    if (chart.options.scales.x) chart.options.scales.x.ticks.color = textColor;
+                    if (chart.options.scales.y) {
+                        chart.options.scales.y.ticks.color = textColor;
+                        chart.options.scales.y.grid.color = gridColor;
+                    }
+                }
+                if (chart.options.plugins && chart.options.plugins.legend) {
+                    chart.options.plugins.legend.labels.color = textColor;
+                }
+                chart.update();
+            });
+        }
+
+        /* ==========================================================================
+           TABLE RENDERING & FILTERING
+           ========================================================================== */
+        function renderTableData(dataArr) {
+            const tbody = document.getElementById('weeklyTableBody');
+            tbody.innerHTML = '';
+
+            if (dataArr.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="14" class="text-center py-6 text-slate-400">Tidak ada data telemetry yang cocok.</td></tr>`;
+                document.getElementById('recordCountBadge').innerText = "0 Baris";
+                return;
+            }
+
+            document.getElementById('recordCountBadge').innerText = `${dataArr.length} Baris`;
+
+            dataArr.forEach(row => {
+                const originalIndex = weeklyData.indexOf(row);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-navy-800/60 transition-colors";
+
+                let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">Nihil Inc</span>`;
+                if (row.pd > 0 || row.nm > 0) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-caution dark:bg-amber-950 dark:text-amber-400">Perlu Evaluasi</span>`;
+                } else if (row.mp === 0) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">Standby / Off</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-4 font-semibold text-slate-800 dark:text-slate-200">
+                        ${row.week} <span class="text-[10px] font-normal text-slate-400 block">${row.month}</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-bold text-slate-700 dark:text-slate-300">${row.mp}</td>
+                    <td class="py-2.5 px-3 text-right">${row.mh.toLocaleString()}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-400">${row.fat}</td>
+                    <td class="py-2.5 px-3 text-center text-slate-400">${row.lwdc}</td>
+                    <td class="py-2.5 px-3 text-center font-bold ${row.pd > 0 ? 'text-caution' : 'text-slate-400'}">${row.pd}</td>
+                    <td class="py-2.5 px-3 text-center font-bold ${row.nm > 0 ? 'text-caution' : 'text-slate-400'}">${row.nm}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">${row.ind}</td>
+                    <td class="py-2.5 px-3 text-right">${row.sm}</td>
+                    <td class="py-2.5 px-3 text-right">${row.ins}</td>
+                    <td class="py-2.5 px-3 text-right">${row.st}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold text-teal-600 dark:text-teal-400">${row.ac}</td>
+                    <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="openDataModal(${originalIndex})" class="px-2 py-1 rounded bg-slate-100 dark:bg-navy-800 text-blue-600 dark:text-blue-400 font-bold hover:bg-slate-200 dark:hover:bg-navy-700">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterTableData() {
+            const query = document.getElementById('tableSearch').value.toLowerCase();
+            const monthVal = document.getElementById('monthSelectFilter').value;
+
+            let filtered = weeklyData.filter(row => {
+                const matchSearch = row.week.toLowerCase().includes(query) || row.month.toLowerCase().includes(query);
+                const matchMonth = (monthVal === 'ALL') || row.month.toUpperCase().includes(monthVal);
+                return matchSearch && matchMonth;
+            });
+
+            if (activeViewMode === 'MONTH') {
+                const currentMonthName = monthlyData[timelineIndex].month;
+                filtered = filtered.filter(r => r.month === currentMonthName);
+            }
+
+            renderTableData(filtered);
+        }
+
+        function switchYear(year) {
+            saveYearStore();
+            loadYearData(year);
+            timelineIndex = 10;
+            document.getElementById('monthScrubber').value = timelineIndex;
+            refreshDashboard();
+        }
+
+        function addNewYear() {
+            const nextYear = prompt("Masukkan tahun baru (contoh 2027):", String(parseInt(currentYear) + 1));
+            if (!nextYear) return;
+            const year = parseInt(nextYear);
+            if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+                alert("Tahun tidak valid.");
+                return;
+            }
+            if (!yearlyStore[String(year)]) {
+                yearlyStore[String(year)] = {
+                    monthlyData: createBlankMonthlyData(year),
+                    weeklyData: createBlankWeeklyData(year)
+                };
+                localStorage.setItem(storageKey, JSON.stringify(yearlyStore));
+            }
+            switchYear(String(year));
+            populateYearControls();
+        }
+
+        function openDataModal(rowIndex = -1) {
+            const modal = document.getElementById('dataModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const monthSelect = document.getElementById('formMonth');
+            monthSelect.innerHTML = monthNames.map(name =>
+                `<option value="${name}">${name.charAt(0) + name.slice(1).toLowerCase()}</option>`
+            ).join('');
+            const weekSelect = document.getElementById('formWeek');
+            weekSelect.innerHTML = Array.from({length:6}, (_,i) =>
+                `<option value="${i + 1}">W${i + 1}</option>`
+            ).join('');
+
+            document.getElementById('formYear').value = currentYear;
+            document.getElementById('editRowIndex').value = rowIndex;
+
+            if (rowIndex >= 0) {
+                const row = weeklyData[rowIndex];
+                const monthIndex = monthNames.findIndex(name => row.month.startsWith(name));
+                const weekNumber = parseInt((row.week.match(/W(\d+)/i) || [,"1"])[1]);
+                monthSelect.value = monthNames[Math.max(monthIndex,0)];
+                weekSelect.value = String(Math.max(weekNumber,1));
+                document.getElementById('dataModalTitle').innerText = "Edit Data Mingguan";
+                document.getElementById('formMp').value = row.mp;
+                document.getElementById('formMh').value = row.mh;
+                document.getElementById('formFat').value = row.fat;
+                document.getElementById('formLwdc').value = row.lwdc;
+                document.getElementById('formPd').value = row.pd;
+                document.getElementById('formNm').value = row.nm;
+                document.getElementById('formInd').value = row.ind;
+                document.getElementById('formSm').value = row.sm;
+                document.getElementById('formIns').value = row.ins;
+                document.getElementById('formSt').value = row.st;
+                document.getElementById('formAc').value = row.ac;
+            } else {
+                document.getElementById('dataModalTitle').innerText = "Tambah Data Mingguan";
+                document.getElementById('dataForm').reset();
+                document.getElementById('formYear').value = currentYear;
+                document.getElementById('editRowIndex').value = "-1";
+                monthSelect.value = monthNames[Math.min(timelineIndex,11)];
+                ["formMp","formMh","formFat","formLwdc","formPd","formNm","formInd","formSm","formIns","formSt","formAc"].forEach(id => {
+                    document.getElementById(id).value = 0;
+                });
+            }
+        }
+
+        function closeDataModal() {
+            const modal = document.getElementById('dataModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveDataRow(event) {
+            event.preventDefault();
+            const year = parseInt(document.getElementById('formYear').value);
+            const monthName = document.getElementById('formMonth').value;
+            const weekNumber = parseInt(document.getElementById('formWeek').value);
+            const monthIndex = monthNames.indexOf(monthName);
+            const row = {
+                month:`${monthName} ${year}`,
+                week:`${monthShort[monthIndex]} - W${weekNumber}`,
+                mp:parseFloat(document.getElementById('formMp').value) || 0,
+                mh:parseFloat(document.getElementById('formMh').value) || 0,
+                fat:parseFloat(document.getElementById('formFat').value) || 0,
+                lwdc:parseFloat(document.getElementById('formLwdc').value) || 0,
+                pd:parseFloat(document.getElementById('formPd').value) || 0,
+                nm:parseFloat(document.getElementById('formNm').value) || 0,
+                ind:parseFloat(document.getElementById('formInd').value) || 0,
+                sm:parseFloat(document.getElementById('formSm').value) || 0,
+                ins:parseFloat(document.getElementById('formIns').value) || 0,
+                st:parseFloat(document.getElementById('formSt').value) || 0,
+                ac:parseFloat(document.getElementById('formAc').value) || 0
+            };
+
+            if (year !== currentYear) {
+                if (!yearlyStore[String(year)]) {
+                    yearlyStore[String(year)] = {
+                        monthlyData:createBlankMonthlyData(year),
+                        weeklyData:createBlankWeeklyData(year)
+                    };
+                }
+                currentYear = year;
+                loadYearData(year);
+            }
+
+            const editIndex = parseInt(document.getElementById('editRowIndex').value);
+            if (editIndex >= 0) {
+                weeklyData[editIndex] = row;
+            } else {
+                weeklyData.push(row);
+                weeklyData.sort((a,b) => monthNames.findIndex(n => a.month.startsWith(n)) - monthNames.findIndex(n => b.month.startsWith(n)));
+            }
+            recomputeMonthlyData();
+            saveYearStore();
+            closeDataModal();
+            refreshDashboard();
+        }
+
+        function recomputeMonthlyData() {
+            let cumulativeSafeMh = 0;
+            let cumulativeInd = 0, cumulativeSm = 0, cumulativeIns = 0, cumulativeSt = 0, cumulativeAc = 0;
+
+            monthlyData = monthNames.map((name, monthIndex) => {
+                const rows = weeklyData.filter(row => row.month.startsWith(name));
+                const mh = rows.reduce((sum,row) => sum + row.mh, 0);
+                const mpValues = rows.filter(row => row.mp > 0).map(row => row.mp);
+                const mp = mpValues.length ? mpValues[mpValues.length - 1] : 0;
+                const fat = rows.reduce((sum,row) => sum + row.fat, 0);
+                const lwdc = rows.reduce((sum,row) => sum + row.lwdc, 0);
+                const pd = rows.reduce((sum,row) => sum + row.pd, 0);
+                const nm = rows.reduce((sum,row) => sum + row.nm, 0);
+                const ind = rows.reduce((sum,row) => sum + row.ind, 0);
+                const sm = rows.reduce((sum,row) => sum + row.sm, 0);
+                const ins = rows.reduce((sum,row) => sum + row.ins, 0);
+                const st = rows.reduce((sum,row) => sum + row.st, 0);
+                const ac = rows.reduce((sum,row) => sum + row.ac, 0);
+                cumulativeSafeMh += mh;
+                cumulativeInd += ind;
+                cumulativeSm += sm;
+                cumulativeIns += ins;
+                cumulativeSt += st;
+                cumulativeAc += ac;
+                return {
+                    id:monthIndex, month:`${name} ${currentYear}`, weeksLabel:`WEEK ${monthIndex * 4 + 1}-${monthIndex * 4 + 4}`,
+                    mp, mh, safeMh:cumulativeSafeMh, fat, lwdc, pd, nm,
+                    ir: mh > 0 ? ((pd + nm) * 200000 / mh) : 0,
+                    indMtd:ind, indLtd:cumulativeInd, smMtd:sm, smLtd:cumulativeSm,
+                    insMtd:ins, insLtd:cumulativeIns, stMtd:st, stLtd:cumulativeSt,
+                    acMtd:ac, acLtd:cumulativeAc, totalLeading:ind + sm + ins + st + ac
+                };
+            });
+        }
+
+        function refreshDashboard() {
+            populateYearControls();
+            populateMonthFilter();
+            document.getElementById('footerDepartment').innerText =
+                `PT ELIT KHARISMA UTAMA (EKU) — HEALTH, SAFETY & ENVIRONMENT DEPARTMENT ${currentYear}`;
+            renderTableData(weeklyData);
+            updateOdometerUI(timelineIndex);
+            if (chartInstances.chartLeadingVsLagging) {
+                chartInstances.chartLeadingVsLagging.data.labels = monthShort;
+                chartInstances.chartLeadingVsLagging.data.datasets[0].data = monthlyData.map(d => d.totalLeading);
+                chartInstances.chartLeadingVsLagging.data.datasets[1].data = monthlyData.map(d => d.pd + d.nm);
+                chartInstances.chartLeadingVsLagging.update();
+                chartInstances.chartManpowerSafeMH.data.datasets[0].data = monthlyData.map(d => d.mp);
+                chartInstances.chartManpowerSafeMH.data.datasets[1].data = monthlyData.map(d => d.safeMh);
+                chartInstances.chartManpowerSafeMH.update();
+                const indTotal = monthlyData.reduce((s,d) => s + d.indMtd,0);
+                const insTotal = monthlyData.reduce((s,d) => s + d.insMtd,0);
+                const acTotal = monthlyData.reduce((s,d) => s + d.acMtd,0);
+                const stTotal = monthlyData.reduce((s,d) => s + d.stMtd,0);
+                const smTotal = monthlyData.reduce((s,d) => s + d.smMtd,0);
+                chartInstances.chartLeadingDistribution.data.labels = [`HSE Induction (${indTotal})`,`HSE Inspection (${insTotal})`,`Action Closure (${acTotal})`,`Safety Talk (${stTotal})`,`Safety Meeting (${smTotal})`];
+                chartInstances.chartLeadingDistribution.data.datasets[0].data = [indTotal,insTotal,acTotal,stTotal,smTotal];
+                chartInstances.chartLeadingDistribution.update();
+                chartInstances.chartIncidentRate.data.datasets[0].data = monthlyData.map(d => d.ir);
+                chartInstances.chartIncidentRate.update();
+            }
+        }
+
+        /* ==========================================================================
+           EXPORT TO CSV FUNCTIONALITY
+           ========================================================================== */
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Bulan,Minggu,Manpower,ManHours,Fatality,LWDC,PropertyDamage,NearMiss,HSE_Induction,Safety_Meeting,HSE_Inspection,Safety_Talk,Action_Closure\n";
+
+            weeklyData.forEach(r => {
+                csvContent += `"${r.month}","${r.week}",${r.mp},${r.mh},${r.fat},${r.lwdc},${r.pd},${r.nm},${r.ind},${r.sm},${r.ins},${r.st},${r.ac}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `HSE_PERFORMANCE_EKU_${currentYear}_TELEMETRY.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
